@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "src"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.temp.ts"]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "aocplayground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "new-day": "node newDay.js",
+    "initialize": "node scripts/init.js",
+    "start": "ts-node-dev --respawn --cache-directory ./temp"
+  },
+  "keywords": [],
+  "author": "ioan rosgrim",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "node-fetch": "2.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.11",
+    "@types/node-fetch": "2.x",
+    "prettier": "^2.8.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.3"
+  }
+}
