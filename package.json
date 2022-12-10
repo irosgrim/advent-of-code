@@ -5,7 +5,6 @@
   "main": "dist/src/index.js",
   "scripts": {
     "new-day": "node newDay.js",
-    "initialize": "node scripts/init.js",
     "start": "ts-node-dev --respawn --cache-directory ./temp"
   },
   "keywords": [],
