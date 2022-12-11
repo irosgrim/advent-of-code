@@ -6,36 +6,38 @@ const input = fs.readFileSync(inputFile, "utf-8");
 const testInputFile = path.join(__dirname, "test-input.txt");
 const testInput = fs.readFileSync(testInputFile, "utf-8");
 
-const move = (cmd: string): [number, number] => {
+const goto = (cmd: string): [number, number] => {
     const [direction, amount] = cmd.split(" ");
-    //  amount: [y, x]
+    //  amount: [x, y]
     switch (direction) {
         case "U":
-            return [-(amount), 0];
+            return [0, +(amount)];
         case "D":
-            return [+amount, 0];
+            return [0, -amount,];
         case "L":
-            return [0, -(amount)];
+            return [-(amount), 0];
         case "R":
-            return [0, +amount];
+            return [+amount, 0];
         default:
             return [0, 0];
     }
 }
 
+const move = (from: [number, number], to: [number, number]): [number, number] => {
+    return [from[0] + to[0], from[1] + to[1]];
+}
+
 const solve = (inpt: string) => {
+    // [x,y]
     const arr = inpt.split("\n");
-
-    for(const cmd of arr) {
-        console.log(move(cmd));
-
-    }
-    return arr;
+    const [head, tail] = ["H", "T"];
+    
+    return 0;
 }
 
 const part1 = (inpt: string) => {
     const r = solve(inpt);
-    return 1;
+    return r;
 }
 
 const part2 = (inpt: string) => {
@@ -47,8 +49,8 @@ run({
         tests: [
             {
                 input: testInput,
-                expected: 42
-            }
+                expected: 13
+            },
         ],
         solution: part1
     },
