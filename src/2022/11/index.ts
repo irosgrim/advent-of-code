@@ -7,29 +7,37 @@ const testInputFile = path.join(__dirname, "test-input.txt");
 const testInput = fs.readFileSync(testInputFile, "utf-8");
 
 class Monkey  {
-    startingItems: number[] = [];
-    inspectedItems: {from: string, item: number}[] = [];
+    items: number[] = [];
+    inspectedItems: number[] = [];
     props: string[] = [];
+    name: string = "0";
+    divisibleBy = 1;
     constructor(props: string[]) {
-        this.startingItems =  this.setStartingItems(props[1]);
+        this.items =  this.setStartingItems(props[1]);
         this.inspectedItems = [];
         this.props = props;
+        this.name = props[0].split(" ")[1].split(":")[0];
+        const d = props[3].split(" ")
+        this.divisibleBy = +d[d.length - 1];
     }
-    throwNextItem() {
-        if (this.startingItems.length) {
-            const item = this.startingItems.shift();
-            this.throwToMonkey(item);
+    throwNextItem(monkeys: {[key: string] : Monkey}, rounds: number) {
+        if (this.items.length) {
+            const item = this.items.shift();
+            this.throwToMonkey(item, monkeys, rounds);
         }
+    }
+    catchItem(item: number, from: string) {
+        this.items.push(item);
     }
     setStartingItems(str: string) {
         const listStart = str.indexOf(": ");
         const items = str.substring(listStart+2).split(", ").map(Number);
         return items;
     }
-    setWorryLevel(item: number, str: string) {
-        const listStart = str.indexOf(": ");
-        const items = str.substring(listStart).split(" ");
-        const [a, op, b] = items;
+    setWorryLevel(item: number) {
+        const listStart = this.props[2].indexOf(": ");
+        const items = this.props[2].substring(listStart).split(" ");
+        const [,,,a, op, b] = items;
         if(op) {
             switch(op) {
                 case "*":
@@ -37,6 +45,9 @@ class Monkey  {
                         return item * (+b);
                     }
                     if(a !== "old" && b === "old") {
+                        return (+a) * item;
+                    }
+                    if(a === "old" && b === "old") {
                         return item * item;
                     }
                     break;
@@ -45,6 +56,9 @@ class Monkey  {
                         return item + (+b);
                     }
                     if(a !== "old" && b === "old") {
+                        return (+a) + item;
+                    }
+                    if(a === "old" && b === "old") {
                         return item + item;
                     }
                     break;
@@ -55,31 +69,28 @@ class Monkey  {
             return 0;
         }
     }
-    throwToMonkey(item: number) {
+    throwToMonkey(item: number, monkeys: {[key: string] : Monkey}, rounds = 20) {
         const arr = this.props[3].split(" ");
         const nr = +arr[arr.length - 1];
-        const monkeyNr = this.props[0].split(" ")[1].split(":")[0];
-        if (item % nr === 0) {
-            const throwTo = this.props[4].split(" ");
-            this.inspectedItems.push({
-                from: monkeyNr,
-                item,
-            });
-            return {to: throwTo[throwTo.length -1]};
+        let divider = 3;
+        if (rounds > 20) {
+            divider = 1;
+            for (const monkey in monkeys) {
+                divider *= monkeys[monkey].divisibleBy;
+            }
         }
-        if (item % nr !== 0) {
-            const throwTo = this.props[5].split(" ");
-            this.inspectedItems.push({
-                from: monkeyNr,
-                item,
-            });
-            return {to: throwTo[throwTo.length -1]};
-        }
-        return 0;
+        const newWorryLevel = rounds > 20 ? (this.setWorryLevel(item) / divider) : Math.floor(this.setWorryLevel(item) / divider);
+        // const newWorryLevel = this.setWorryLevel(item);
+       
+        const throwTo = newWorryLevel % nr === 0 ? this.props[4].split(" ") : this.props[5].split(" ");
+        const nextMonkey = throwTo[throwTo.length - 1];
+
+        this.inspectedItems.push(newWorryLevel);
+        monkeys[nextMonkey].catchItem(newWorryLevel, this.name);
     }
 }
 
-const solve = (inpt: string) => {
+const solve = (inpt: string, rounds = 20) => {
     const a = inpt.split("\n");
     const aa = a.filter(x => x !== "");
     const monkeys: {[key: string] : Monkey} = {};
@@ -88,24 +99,29 @@ const solve = (inpt: string) => {
         const m = new Monkey(chunk);
         monkeys[i/6] = m;
     }
-    console.log(monkeys);
-    const rounds = 20;
-    let currentRound = 1;
-    for (let i = 1; i < rounds; i++) {
+    for (let i = 0; i < rounds; i++) {
         for (const m in monkeys) {
             const monkey = monkeys[m];
-            monkey.throwNextItem()
+            while (monkey.items.length > 0) {
+                monkey.throwNextItem(monkeys, rounds)
+            }
         }
     }
-    return 1;
+    const topInspected = [];
+    for (const monkey in monkeys) {
+        topInspected.push(monkeys[monkey].inspectedItems.length);
+    }
+    const top2 = topInspected.sort((a, b) => b - a);
+    return top2[0] * top2[1];
 }
 const part1 = (inpt: string) => {
-    const r = solve(inpt);
-    return 1;
+    const r = solve(inpt, 20);
+    return r;
 }
 
 const part2 = (inpt: string) => {
-    return inpt;
+    const r = solve(inpt, 10000);
+    return r;
 }
 
 run({
@@ -113,7 +129,11 @@ run({
         tests: [
             {
                 input: testInput,
-                expected: 42
+                expected: 10605
+            },
+            {
+                input: input,
+                expected: 58056
             }
         ],
         solution: part1
@@ -121,8 +141,8 @@ run({
     part2: {
         tests: [
             {
-                input: 42,
-                expected: 42
+                input: testInput,
+                expected: 2713310158
             },
         ],
         solution: part2,
