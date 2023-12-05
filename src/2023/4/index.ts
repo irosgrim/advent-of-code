@@ -9,7 +9,7 @@ const testInput = fs.readFileSync(testInputFile, "utf-8");
 console.log(`Solving: ${__dirname.slice(__dirname.indexOf("src") + 4)}`);
 
 const part1 = (inpt: string) => {
-  const arr: any[][] = inpt.split("\n").map(x => {
+  const arr: any[][] = inpt.split("\n").filter(x => x.length > 0).map(x => {
     return x.split(": ")[1].split(" | ");
   });
 
@@ -37,7 +37,7 @@ const part1 = (inpt: string) => {
 };
 
 const part2 = (inpt: string) => {
-  const arr: any[][] = inpt.split("\n").map(x => {
+  const arr: any[][] = inpt.split("\n").filter(x => x.length > 0).map(x => {
     return x.split(": ")[1].split(" | ");
   });
 

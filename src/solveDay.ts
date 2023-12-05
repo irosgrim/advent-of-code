@@ -25,19 +25,19 @@ if (parseInt(day) < 1 || parseInt(day) > 25) {
   process.exit(1);
 }
 
-const createFiles = async (sourceDir: string, destinationDir: string) => {
-  try {
-    await fs.mkdirSync(destinationDir, { recursive: true });
-    const inputFile = `${__dirname}/${year}/${day}/input.txt`;
-    const puzzleUrl = `https://adventofcode.com/${year}/day/${day}/input`;
-
+const getInput = async (year: number, day: number) => {
+   const puzzleUrl = `https://adventofcode.com/${year}/day/${day}/input`;
     const f = await fetch(puzzleUrl, {
       headers: {
         cookie: `session=${process.env.AOC_SESSION_COOKIE}`,
       },
     });
-    const data = await f.text();
+    return f.text();
+}
 
+const createFiles = async (sourceDir: string, destinationDir: string) => {
+  try {
+    await fs.mkdirSync(destinationDir, { recursive: true });
     const files = await fs.readdirSync(sourceDir);
     await fs.mkdirSync(destinationDir, { recursive: true });
 
@@ -46,6 +46,10 @@ const createFiles = async (sourceDir: string, destinationDir: string) => {
       const destFile = path.join(destinationDir, file);
       await fs.copyFileSync(sourceFile, destFile);
     }
+
+    const inputFile = `${__dirname}/${year}/${day}/input.txt`;
+    const data = await getInput(+year, +day);
+
     await fs.writeFileSync(inputFile, data);
 
     console.log(`✨ DONE creating files`);
@@ -76,6 +80,14 @@ const createFiles = async (sourceDir: string, destinationDir: string) => {
       },
     );
   } else {
+    const inputFile = `${__dirname}/${year}/${day}/input.txt`;
+    const inputFileExists =  await fs.existsSync(inputFile);
+    
+    if (!inputFileExists) {
+      const data = await getInput(+year, +day);
+      await fs.writeFileSync(inputFile, data);
+    }
+    
     const watchPath = `src/${year}/${day}`;
     const command = `ts-node ${watchPath} ${watchPath}/index.ts`;
 

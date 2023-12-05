@@ -70,7 +70,6 @@ const getNumberGroup = (arr: string[][], row: number, col: number): number => {
         start++;
     }
 
-    console.log(group)
     return parseInt(group, 10);
 };
 
@@ -108,14 +107,14 @@ const part2 = (inpt: string) => {
 run({
   part1: {
     tests: [
-      // {
-      //   input: testInput,
-      //   expected: 4361,
-      // },
-      // {
-      //   input: input,
-      //   expected: 532445,
-      // },
+      {
+        input: testInput,
+        expected: 4361,
+      },
+      {
+        input: input,
+        expected: 532445,
+      },
     ],
     solution: part1,
   },
